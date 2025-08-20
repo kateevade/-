@@ -1,0 +1,17 @@
+# Задание 1. При вводе номера года 2020 выводится строка «Високосный год». При вводе номера года 2019 выводится строка «Обычный год»
+def is_leap_year(year):
+    if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+        return "Високосный год"
+    else:
+        return "Обычный год"
+year = 2020
+print(is_leap_year(year))
+
+year = 2019
+print(is_leap_year(year)) 
+
+year = 2016
+print(is_leap_year(year))
+
+year = 2018
+print(is_leap_year(year))
