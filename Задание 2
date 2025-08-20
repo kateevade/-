@@ -1,0 +1,23 @@
+#Задание 2. При вводе числа 123456 выводится надпись «Несчастливый билет». При вводе числа 123321 выводится надпись «Счастливый билет»
+def is_lucky_ticket(number):
+    if not (100000 <= number <= 999999):
+        return "Номер билета должен быть шестизначным"
+    num_str = str(number)
+    first_half_sum = sum(int(digit) for digit in num_str[:3])
+    second_half_sum = sum(int(digit) for digit in num_str[3:])
+     if first_half_sum == second_half_sum:
+        return "Счастливый билет"
+    else:
+        return "Несчастливый билет"
+
+number = 123456
+print(is_lucky_ticket(number)) 
+
+number = 123321
+print(is_lucky_ticket(number)) 
+
+number = 123457
+print(is_lucky_ticket(number))
+
+number = 124421
+print(is_lucky_ticket(number))
