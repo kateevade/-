@@ -44,9 +44,9 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "b2793c1b-6a67-493b-be93-3f003e986f94",
                 "44866afc-62ce-4e90-aa8d-db4161d868aa",
-                "28143782-b02f-4a1a-8835-1e824d6dd479"
+                "28143782-b02f-4a1a-8835-1e824d6dd479",
+                "b2793c1b-6a67-493b-be93-3f003e986f94"
               ],
               "containedElements": [
                 "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
@@ -69,8 +69,8 @@
                 "text": "User"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -167,9 +167,53 @@
               "isTrustBoundary": false,
               "outOfScope": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "providesAuthentication": false,
-              "threats": []
+              "threats": [
+                {
+                  "id": "7dba2b2f-3ae3-4125-bf00-a140a7f20edc",
+                  "title": "User identity spoofing via X-User-Id",
+                  "status": "Open",
+                  "severity": "Critical",
+                  "type": "Spoofing",
+                  "description": "The API accepts the X-User-Id HTTP header from the client and converts it directly to an integer user identifier. The supplied code does not verify the identity using JWT, OAuth2, a session or another cryptographically verifiable authentication mechanism. An attacker may therefore provide another user's identifier and act in the context of that user. This can undermine the authorization checks that rely on the user_id value.\n",
+                  "mitigation": "Replace the client-controlled X-User-Id identification mechanism with proper authentication, such as OAuth2/OIDC or signed JWT access tokens. Validate the token on every protected request and derive the authenticated user ID from the verified token claims rather than from a client-supplied header. Keep server-side authorization checks for account ownership.\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 2,
+                  "score": ""
+                },
+                {
+                  "id": "24a745a3-ff22-4112-ba15-660320e8b4c0",
+                  "title": "Repudiation of transfer request",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Repudiation",
+                  "description": "The application does not show a complete audit mechanism that reliably associates transfer requests with a strongly authenticated user identity. Because the current identity is supplied through the client-controlled X-User-Id header, it may be difficult to prove which authenticated user actually initiated a transaction.\n",
+                  "mitigation": "Use cryptographically verifiable authentication and derive the user identity from the verified access token. Record security-relevant events such as successful and failed transfers, authenticated user ID, source account, destination account, amount, timestamp, and transaction ID in an append-only audit log.\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 11,
+                  "score": ""
+                },
+                {
+                  "id": "5b1b8918-aa80-4025-a60b-68b376043dac",
+                  "title": "Exposure of user and transaction information",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Repudiation",
+                  "description": "The current authentication mechanism does not provide a cryptographically verifiable identity for API requests. Because the user identity is supplied through the X-User-Id header, it may be difficult to reliably attribute a transfer or other API action to a specific user.\n",
+                  "mitigation": "Use signed JWT or OAuth2/OIDC authentication and derive the user identity from verified credentials. Maintain an audit log of security-sensitive actions, including the authenticated user ID, operation, timestamp, request result, and transaction ID where applicable.\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 14,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "spoofing": 1,
+                "repudiation": 2
+              }
             }
           },
           {
@@ -186,8 +230,8 @@
                 "text": "FastAPI Backend"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -284,60 +328,60 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": true,
               "privilegeLevel": "",
-              "threats": []
-            }
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "#333333",
-                "targetMarker": {
-                  "name": "block"
+              "threats": [
+                {
+                  "id": "ad4178f1-07e1-47d4-9578-899519db7ddd",
+                  "title": "Unauthorized transfer due to broken authorization",
+                  "status": "Open",
+                  "severity": "Critical",
+                  "type": "Elevation of privilege",
+                  "description": "The API performs an ownership check for the source account using the user_id value obtained from the authentication layer. However, the current authentication mechanism accepts the client-controlled X-User-Id header without cryptographic verification. An attacker who can impersonate another user may therefore pass the ownership check and initiate a transfer from that user's account.\n",
+                  "mitigation": "Implement strong authentication using OAuth2/OIDC or signed JWT access tokens. Derive the authenticated user ID only from a verified token and perform server-side authorization checks for every account operation. Additionally, enforce transfer limits and maintain an audit trail for financial operations.\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 3,
+                  "score": ""
                 },
-                "sourceMarker": {
-                  "name": ""
+                {
+                  "id": "0504a8b8-f448-47ad-9e23-724791ff2df3",
+                  "title": "Replay of transfer requests",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "The transfer endpoint does not show a mechanism for detecting or preventing replay of an identical request. If an attacker captures a valid transfer request, the same request may potentially be submitted again. Repeated execution could result in an unintended duplicate transfer.",
+                  "mitigation": "Require authenticated requests using signed access tokens and implement idempotency keys for transfer operations. Store the idempotency key and resulting transaction ID for a defined period and reject duplicate requests. Log transfer attempts for auditing and investigation.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 7,
+                  "score": ""
                 },
-                "strokeDasharray": null
+                {
+                  "id": "925fb2e3-639d-4e16-8e2d-96ce5144a4d2",
+                  "title": "API resource exhaustion",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "The API does not show rate limiting or request throttling for transfer and transaction-history endpoints. An attacker may send a large number of requests and consume application, database, or Redis resources, potentially degrading service availability for legitimate users.\n",
+                  "mitigation": "Implement rate limiting and request throttling for sensitive endpoints. Configure connection and request timeouts, limit resource consumption, monitor request rates and backend resource usage, and apply appropriate protections at the API gateway or reverse proxy.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 12,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "spoofing": 1,
+                "tampering": 2,
+                "repudiation": 0,
+                "informationDisclosure": 0,
+                "denialOfService": 0,
+                "elevationOfPrivilege": 1
               }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 10,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "HTTP API requests",
-              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
-              "outOfScope": false,
-              "isTrustBoundary": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": false,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": [
-                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
-              ]
-            },
-            "labels": [
-              "HTTP API requests"
-            ],
-            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
-            "source": {
-              "x": 213,
-              "y": 210
-            },
-            "target": {
-              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
-              "port": "b968de55-b279-44fe-963c-9246441cbda1"
             }
           },
           {
@@ -439,6 +483,75 @@
             "vertices": []
           },
           {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "HTTP API requests",
+              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "c2a4f30b-46c6-4554-8cdf-c2d72adca5e4",
+                  "title": "Sensitive data exposure in HTTP requests",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
+                  "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 6,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ],
+              "threatFrequency": {
+                "tampering": 0,
+                "informationDisclosure": 1,
+                "denialOfService": 0
+              }
+            },
+            "labels": [
+              "HTTP API requests"
+            ],
+            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
+            "source": {
+              "x": 213,
+              "y": 210
+            },
+            "target": {
+              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
+              "port": "b968de55-b279-44fe-963c-9246441cbda1"
+            },
+            "vertices": []
+          },
+          {
             "position": {
               "x": 410,
               "y": 399
@@ -452,11 +565,13 @@
                 "text": "Redis"
               },
               "topLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               },
               "bottomLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -553,13 +668,59 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isALog": false,
               "isEncrypted": false,
               "isSigned": false,
               "storesCredentials": false,
               "storesInventory": false,
-              "threats": []
+              "threats": [
+                {
+                  "id": "93591092-6af7-4723-8c06-f2bf1da81d82",
+                  "title": "Unauthorized access to Redis",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "Redis is used by the backend for caching and is exposed as a separate infrastructure service. The supplied configuration does not show authentication, ACLs, TLS, or network restrictions for Redis. An attacker who gains network access to the Redis service may read, modify, or delete cached data and potentially interfere with application behavior.",
+                  "mitigation": "Restrict Redis access to the internal application network and do not expose port 6379 publicly. Enable Redis authentication and ACLs where appropriate, use TLS for connections when traffic crosses an untrusted network, and apply least-privilege access controls. Do not store sensitive data in Redis unless it is adequately protected.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 5,
+                  "score": ""
+                },
+                {
+                  "id": "03917f2c-b076-4953-acc9-8a84b9bfb8d1",
+                  "title": "Cache data tampering",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "Redis is used by the backend for application caching. An attacker with unauthorized access to Redis could modify or delete cached data. This could cause incorrect application behavior, invalidate cached information, or interfere with the availability of the service.",
+                  "mitigation": "Restrict Redis access to the internal application network. Enable authentication and ACLs, apply least-privilege permissions, and do not expose port 6379 to untrusted networks. Validate data retrieved from the cache and ensure that sensitive operations rely on authoritative database data.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 9,
+                  "score": ""
+                },
+                {
+                  "id": "4f247edc-7818-48be-af75-4a19a74647fe",
+                  "title": "Redis service disruption",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Denial of service",
+                  "description": "The FastAPI backend depends on Redis for cache operations. An attacker who can access the Redis service could delete cached data, issue excessive requests, or otherwise consume Redis resources. This could increase backend load and degrade the availability of the application.\n",
+                  "mitigation": "Restrict Redis access to the internal application network and do not expose port 6379 to untrusted networks. Configure authentication and ACLs, apply resource limits, and monitor Redis availability and resource consumption. The application should also handle Redis failures gracefully without becoming unavailable.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 10,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "repudiation": 0,
+                "informationDisclosure": 1,
+                "denialOfService": 1
+              }
             }
           },
           {
@@ -576,11 +737,13 @@
                 "text": "PostgreSQL"
               },
               "topLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               },
               "bottomLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -677,13 +840,59 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isALog": false,
               "isEncrypted": false,
               "isSigned": false,
               "storesCredentials": false,
               "storesInventory": false,
-              "threats": []
+              "threats": [
+                {
+                  "id": "fc8f7080-9858-4936-88a1-c99f64353bb6",
+                  "title": "Unauthorized access to database",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "The PostgreSQL database contains account balances and transaction records. The database service is exposed on the host through port 5432, and the deployment configuration uses a hard-coded PostgreSQL username and password. If an attacker gains network access to the exposed database service or obtains these credentials, sensitive banking data may be disclosed or modified.",
+                  "mitigation": "Do not expose PostgreSQL directly to the host or public network unless required. Restrict database access to the application network using firewall rules and container networking. Store database credentials in secrets or environment-specific secret management instead of hard-coding them. Use a dedicated database user with only the permissions required by the application.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 4,
+                  "score": ""
+                },
+                {
+                  "id": "fe15694e-7ee8-4f02-b48b-5589623851a5",
+                  "title": "Unauthorized modification of account data",
+                  "status": "Open",
+                  "severity": "Critical",
+                  "type": "Tampering",
+                  "description": "The PostgreSQL database stores account balances and transaction records. If an attacker obtains direct database access or application-level privileges beyond those required for normal operations, account balances or transaction records could be modified without authorization. Such modification could affect the integrity of financial data.",
+                  "mitigation": "Restrict database access to the backend service and use a dedicated least-privilege database account. Do not expose PostgreSQL to untrusted networks. Apply strict authorization checks in the application and maintain audit logs for financial data changes. Protect database credentials using a secrets-management mechanism.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 8,
+                  "score": ""
+                },
+                {
+                  "id": "88db2d1d-d634-4a04-b124-5bc3675de197",
+                  "title": "Insufficient database audit trail",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Repudiation",
+                  "description": "The database schema contains account and transaction records but does not show a dedicated audit trail for security-sensitive database operations. Without sufficient audit logging, unauthorized or unexpected modifications to financial data may be difficult to investigate and attribute.\n",
+                  "mitigation": "Implement centralized and tamper-resistant audit logging for security-sensitive operations. Record the authenticated user identity, operation, affected account or transaction, timestamp, and result. Restrict access to audit logs and retain them according to the application's security and compliance requirements.\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 13,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "repudiation": 1,
+                "informationDisclosure": 1,
+                "denialOfService": 0
+              }
             }
           }
         ]
@@ -691,6 +900,6 @@
     ],
     "diagramTop": 1,
     "reviewer": "",
-    "threatTop": 0
+    "threatTop": 14
   }
 }
