@@ -35,8 +35,8 @@
             },
             "visible": true,
             "shape": "trust-boundary-box",
-            "id": "3ac11391-153f-46d6-9f8d-dd776b3d80a9",
             "zIndex": -1,
+            "id": "3ac11391-153f-46d6-9f8d-dd776b3d80a9",
             "data": {
               "type": "tm.BoundaryBox",
               "name": "Application / Infrastructure",
@@ -287,7 +287,7 @@
               "hasOpenThreats": false,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
-              "isWebApplication": false,
+              "isWebApplication": true,
               "privilegeLevel": "",
               "threats": []
             }
