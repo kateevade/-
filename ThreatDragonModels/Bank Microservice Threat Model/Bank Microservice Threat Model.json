@@ -21,6 +21,42 @@
         "cells": [
           {
             "position": {
+              "x": 379.9999999999967,
+              "y": -69.99999999999989
+            },
+            "size": {
+              "width": 210,
+              "height": 560
+            },
+            "attrs": {
+              "label": {
+                "text": "Application / Infrastructure"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "id": "3ac11391-153f-46d6-9f8d-dd776b3d80a9",
+            "zIndex": -1,
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Application / Infrastructure",
+              "description": "Trust boundary separating the external user from the application and backend infrastructure.",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "b2793c1b-6a67-493b-be93-3f003e986f94",
+                "44866afc-62ce-4e90-aa8d-db4161d868aa",
+                "28143782-b02f-4a1a-8835-1e824d6dd479"
+              ],
+              "containedElements": [
+                "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
+                "60a34af1-a0f3-4815-944e-07877283e1ff",
+                "2dda7528-5ab9-46c2-92c5-592e815baa5f"
+              ]
+            }
+          },
+          {
+            "position": {
               "x": 100,
               "y": 180
             },
@@ -40,6 +76,7 @@
             },
             "visible": true,
             "shape": "actor",
+            "zIndex": 1,
             "ports": {
               "groups": {
                 "top": {
@@ -123,7 +160,6 @@
               ]
             },
             "id": "cb6df808-42b5-4eb2-8c20-bc4a2c1725c8",
-            "zIndex": 1,
             "data": {
               "type": "tm.Actor",
               "name": "User",
@@ -157,6 +193,7 @@
             },
             "visible": true,
             "shape": "process",
+            "zIndex": 2,
             "ports": {
               "groups": {
                 "top": {
@@ -240,7 +277,6 @@
               ]
             },
             "id": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
-            "zIndex": 2,
             "data": {
               "type": "tm.Process",
               "name": "FastAPI Backend",
@@ -287,7 +323,9 @@
               "isPublicNetwork": false,
               "protocol": "",
               "threats": [],
-              "trustBoundaryIds": []
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ]
             },
             "labels": [
               "HTTP API requests"
@@ -333,7 +371,9 @@
               "isPublicNetwork": false,
               "protocol": "",
               "threats": [],
-              "trustBoundaryIds": []
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ]
             },
             "labels": [
               "Cache operations"
@@ -347,121 +387,7 @@
               "cell": "60a34af1-a0f3-4815-944e-07877283e1ff",
               "port": "cc82056a-75c4-4f43-b577-e4a085b5826d"
             },
-            "tools": {
-              "items": [
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead",
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead"
-              ],
-              "name": null
-            }
+            "vertices": []
           },
           {
             "shape": "flow",
@@ -494,7 +420,9 @@
               "isPublicNetwork": false,
               "protocol": "",
               "threats": [],
-              "trustBoundaryIds": []
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ]
             },
             "labels": [
               "SQL queries"
@@ -534,6 +462,7 @@
             },
             "visible": true,
             "shape": "store",
+            "zIndex": 11,
             "ports": {
               "groups": {
                 "top": {
@@ -617,7 +546,6 @@
               ]
             },
             "id": "60a34af1-a0f3-4815-944e-07877283e1ff",
-            "zIndex": 11,
             "data": {
               "type": "tm.Store",
               "name": "Redis",
@@ -658,6 +586,7 @@
             },
             "visible": true,
             "shape": "store",
+            "zIndex": 12,
             "ports": {
               "groups": {
                 "top": {
@@ -741,7 +670,6 @@
               ]
             },
             "id": "2dda7528-5ab9-46c2-92c5-592e815baa5f",
-            "zIndex": 12,
             "data": {
               "type": "tm.Store",
               "name": "PostgreSQL",
