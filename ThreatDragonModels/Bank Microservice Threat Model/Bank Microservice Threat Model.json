@@ -198,7 +198,7 @@
                 },
                 {
                   "id": "5b1b8918-aa80-4025-a60b-68b376043dac",
-                  "title": "Exposure of user and transaction information",
+                  "title": "Unreliable attribution of user actions",
                   "status": "Open",
                   "severity": "Medium",
                   "type": "Repudiation",
@@ -212,8 +212,15 @@
               ],
               "threatFrequency": {
                 "spoofing": 1,
-                "repudiation": 2
+                "repudiation": 3
               }
+            },
+            "tools": {
+              "items": [
+                "boundary",
+                "button-remove"
+              ],
+              "name": null
             }
           },
           {
