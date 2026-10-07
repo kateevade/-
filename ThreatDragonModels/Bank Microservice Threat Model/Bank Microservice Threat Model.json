@@ -44,9 +44,9 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "28143782-b02f-4a1a-8835-1e824d6dd479",
+                "b2793c1b-6a67-493b-be93-3f003e986f94",
                 "44866afc-62ce-4e90-aa8d-db4161d868aa",
-                "b2793c1b-6a67-493b-be93-3f003e986f94"
+                "28143782-b02f-4a1a-8835-1e824d6dd479"
               ],
               "containedElements": [
                 "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
@@ -444,28 +444,28 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "SQL queries",
-              "description": "SQL queries for account ownership checks, balance updates and transaction retrieval.",
+              "name": "HTTP API requests",
+              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
               "hasOpenThreats": true,
               "isBidirectional": true,
               "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
+              "isPublicNetwork": true,
+              "protocol": "JSON",
               "threats": [
                 {
-                  "id": "03b952aa-714a-4822-ab06-84d0f60ff5d9",
-                  "title": "Dynamic SQL construction (potential SQL injection)",
+                  "id": "c2a4f30b-46c6-4554-8cdf-c2d72adca5e4",
+                  "title": "Sensitive data exposure in HTTP requests",
                   "status": "Open",
-                  "severity": "Low",
-                  "type": "Tampering",
-                  "description": "list_transactions() builds the SQL text with f-strings (Semgrep: python-sql-dynamic-query-construction, CWE-89). Manual review shows that only the placeholder index (${i}) is interpolated, while the user-controlled value of 'search' is passed as a bound asyncpg parameter, so exploitation is NOT confirmed. The risk is regression: a future change that interpolates a value instead of a placeholder would introduce a real SQL injection. Note also that '%' and '_' in 'search' act as ILIKE wildcards.",
-                  "mitigation": "Use a static parameterized query (e.g. ($2::text IS NULL OR ... ILIKE $2)) or a query builder instead of string concatenation; keep the Semgrep rule in CI as a regression guard; escape LIKE wildcards in user input.",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
+                  "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 17,
+                  "number": 6,
                   "score": ""
                 }
               ],
@@ -473,22 +473,22 @@
                 "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
               ],
               "threatFrequency": {
-                "tampering": 1,
-                "informationDisclosure": 0,
-                "denialOfService": 0
+                "tampering": 0,
+                "informationDisclosure": 3,
+                "denialOfService": 1
               }
             },
             "labels": [
-              "SQL queries"
+              "HTTP API requests"
             ],
-            "id": "28143782-b02f-4a1a-8835-1e824d6dd479",
+            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
             "source": {
-              "x": 470,
-              "y": 149
+              "x": 213,
+              "y": 210
             },
             "target": {
-              "cell": "2dda7528-5ab9-46c2-92c5-592e815baa5f",
-              "port": "0d59404f-b797-47ff-9f99-ed84c9ec5817"
+              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
+              "port": "b968de55-b279-44fe-963c-9246441cbda1"
             },
             "vertices": []
           },
@@ -522,7 +522,7 @@
               "isBidirectional": true,
               "isEncrypted": false,
               "isPublicNetwork": false,
-              "protocol": "",
+              "protocol": "TCP 6379",
               "threats": [
                 {
                   "id": "fd7c55e0-ee8e-4ff2-8e7f-12e1d4f0b802",
@@ -571,7 +571,7 @@
                   "name": "block"
                 },
                 "sourceMarker": {
-                  "name": ""
+                  "name": "block"
                 },
                 "strokeDasharray": null
               }
@@ -582,28 +582,28 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "HTTP API requests",
-              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
+              "name": "SQL queries",
+              "description": "SQL queries for account ownership checks, balance updates and transaction retrieval.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
               "hasOpenThreats": true,
-              "isBidirectional": false,
+              "isBidirectional": true,
               "isEncrypted": false,
               "isPublicNetwork": false,
-              "protocol": "",
+              "protocol": "TCP 5432",
               "threats": [
                 {
-                  "id": "c2a4f30b-46c6-4554-8cdf-c2d72adca5e4",
-                  "title": "Sensitive data exposure in HTTP requests",
+                  "id": "03b952aa-714a-4822-ab06-84d0f60ff5d9",
+                  "title": "Dynamic SQL construction (potential SQL injection)",
                   "status": "Open",
-                  "severity": "High",
-                  "type": "Information disclosure",
-                  "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
-                  "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
+                  "severity": "Low",
+                  "type": "Tampering",
+                  "description": "list_transactions() builds the SQL text with f-strings (Semgrep: python-sql-dynamic-query-construction, CWE-89). Manual review shows that only the placeholder index (${i}) is interpolated, while the user-controlled value of 'search' is passed as a bound asyncpg parameter, so exploitation is NOT confirmed. The risk is regression: a future change that interpolates a value instead of a placeholder would introduce a real SQL injection. Note also that '%' and '_' in 'search' act as ILIKE wildcards.",
+                  "mitigation": "Use a static parameterized query (e.g. ($2::text IS NULL OR ... ILIKE $2)) or a query builder instead of string concatenation; keep the Semgrep rule in CI as a regression guard; escape LIKE wildcards in user input.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 6,
+                  "number": 17,
                   "score": ""
                 }
               ],
@@ -611,22 +611,22 @@
                 "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
               ],
               "threatFrequency": {
-                "tampering": 0,
-                "informationDisclosure": 3,
-                "denialOfService": 1
+                "tampering": 1,
+                "informationDisclosure": 0,
+                "denialOfService": 0
               }
             },
             "labels": [
-              "HTTP API requests"
+              "SQL queries"
             ],
-            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
+            "id": "28143782-b02f-4a1a-8835-1e824d6dd479",
             "source": {
-              "x": 213,
-              "y": 210
+              "x": 470,
+              "y": 149
             },
             "target": {
-              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
-              "port": "b968de55-b279-44fe-963c-9246441cbda1"
+              "cell": "2dda7528-5ab9-46c2-92c5-592e815baa5f",
+              "port": "0d59404f-b797-47ff-9f99-ed84c9ec5817"
             },
             "vertices": []
           },
