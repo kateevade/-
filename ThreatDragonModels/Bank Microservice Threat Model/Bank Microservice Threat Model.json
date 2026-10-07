@@ -44,9 +44,9 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "44866afc-62ce-4e90-aa8d-db4161d868aa",
+                "b2793c1b-6a67-493b-be93-3f003e986f94",
                 "28143782-b02f-4a1a-8835-1e824d6dd479",
-                "b2793c1b-6a67-493b-be93-3f003e986f94"
+                "44866afc-62ce-4e90-aa8d-db4161d868aa"
               ],
               "containedElements": [
                 "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
@@ -202,8 +202,8 @@
                   "status": "Open",
                   "severity": "Medium",
                   "type": "Repudiation",
-                  "description": "The current authentication mechanism does not provide a cryptographically verifiable identity for API requests. Because the user identity is supplied through the X-User-Id header, it may be difficult to reliably attribute a transfer or other API action to a specific user.\n",
-                  "mitigation": "Use signed JWT or OAuth2/OIDC authentication and derive the user identity from verified credentials. Maintain an audit log of security-sensitive actions, including the authenticated user ID, operation, timestamp, request result, and transaction ID where applicable.\n",
+                  "description": "The current authentication mechanism does not provide a cryptographically verifiable identity for API requests. Because the user identity is supplied through the X-User-Id header, it may be difficult to reliably attribute a transfer or other API action to a specific user.",
+                  "mitigation": "Use signed JWT or OAuth2/OIDC authentication and derive the user identity from verified credentials. Maintain an audit log of security-sensitive actions, including the authenticated user ID, operation, timestamp, request result, and transaction ID where applicable.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 14,
@@ -212,15 +212,8 @@
               ],
               "threatFrequency": {
                 "spoofing": 1,
-                "repudiation": 3
+                "repudiation": 5
               }
-            },
-            "tools": {
-              "items": [
-                "boundary",
-                "button-remove"
-              ],
-              "name": null
             }
           },
           {
@@ -379,115 +372,56 @@
                   "new": false,
                   "number": 12,
                   "score": ""
+                },
+                {
+                  "id": "507f3f6c-9ec2-4b09-8d4e-3f43402e293b",
+                  "title": "Race condition in transfer (double spend)",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "transfer() reads the balance with a plain SELECT and then updates it in the same transaction without row locking (no SELECT ... FOR UPDATE, no atomic conditional UPDATE). Under the default READ COMMITTED isolation two concurrent requests can both pass the 'Insufficient funds' check and both debit the account, producing a negative balance or an overdraft. This directly affects the integrity of the money ledger.",
+                  "mitigation": "Lock the source row (SELECT ... FOR UPDATE) or use an atomic UPDATE ... SET balance = balance - $1 WHERE id=$2 AND balance >= $1; lock accounts in a consistent order to avoid deadlocks; add a CHECK (balance_cents >= 0) constraint; add concurrency tests for transfers.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 15,
+                  "score": ""
+                },
+                {
+                  "id": "4ca3fafb-2dbb-41ec-89ae-5d43a36274c3",
+                  "title": "Account enumeration through error responses",
+                  "status": "Open",
+                  "severity": "Low",
+                  "type": "Information disclosure",
+                  "description": "The API returns 403 for an account that exists but belongs to someone else and 404 'From/To account not found' for a missing account. An authenticated attacker can iterate account IDs and learn which accounts exist\n                 ",
+                  "mitigation": "Return a uniform error for non-owned and non-existing source accounts; for the destination account avoid revealing existence beyond what is required; add rate limiting and monitoring of repeated failed lookups.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 16,
+                  "score": ""
+                },
+                {
+                  "id": "4e9e223c-f816-4d97-988c-75a9189aa5af",
+                  "title": "Exposure of transaction history through weak identity",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "GET /transactions возвращает историю владельца, определённого по заголовку X-User-Id. Значение задаёт клиент и не проверяется криптографически, поэтому атакующий может подставить чужой ID и прочитать переводы (суммы, контрагенты, даты).",
+                  "mitigation": "Определять пользователя только по проверенному токену (OAuth2/OIDC или подписанный JWT). Добавить негативные тесты авторизации (пользователь A не читает историю B), логировать доступ к истории.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 19,
+                  "score": ""
                 }
               ],
               "threatFrequency": {
                 "spoofing": 1,
-                "tampering": 2,
+                "tampering": 3,
                 "repudiation": 0,
-                "informationDisclosure": 0,
+                "informationDisclosure": 2,
                 "denialOfService": 0,
                 "elevationOfPrivilege": 1
               }
             }
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "#333333",
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": {
-                  "name": ""
-                },
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 10,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "Cache operations",
-              "description": "Redis GET and DELETE operations used for transaction-related cache data.",
-              "outOfScope": false,
-              "isTrustBoundary": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": false,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": [
-                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
-              ]
-            },
-            "labels": [
-              "Cache operations"
-            ],
-            "id": "44866afc-62ce-4e90-aa8d-db4161d868aa",
-            "source": {
-              "x": 470,
-              "y": 270
-            },
-            "target": {
-              "cell": "60a34af1-a0f3-4815-944e-07877283e1ff",
-              "port": "cc82056a-75c4-4f43-b577-e4a085b5826d"
-            },
-            "vertices": []
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "#333333",
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": {
-                  "name": ""
-                },
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 10,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "SQL queries",
-              "description": "SQL queries for account ownership checks, balance updates and transaction retrieval.",
-              "outOfScope": false,
-              "isTrustBoundary": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": false,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": [
-                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
-              ]
-            },
-            "labels": [
-              "SQL queries"
-            ],
-            "id": "28143782-b02f-4a1a-8835-1e824d6dd479",
-            "source": {
-              "x": 470,
-              "y": 149
-            },
-            "target": {
-              "cell": "2dda7528-5ab9-46c2-92c5-592e815baa5f",
-              "port": "0d59404f-b797-47ff-9f99-ed84c9ec5817"
-            },
-            "vertices": []
           },
           {
             "shape": "flow",
@@ -526,7 +460,7 @@
                   "title": "Sensitive data exposure in HTTP requests",
                   "status": "Open",
                   "severity": "High",
-                  "type": "Information disclosure",
+                  "type": "Denial of service",
                   "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
                   "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
                   "modelType": "STRIDE",
@@ -540,8 +474,8 @@
               ],
               "threatFrequency": {
                 "tampering": 0,
-                "informationDisclosure": 1,
-                "denialOfService": 0
+                "informationDisclosure": 2,
+                "denialOfService": 1
               }
             },
             "labels": [
@@ -555,6 +489,144 @@
             "target": {
               "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
               "port": "b968de55-b279-44fe-963c-9246441cbda1"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": "block"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "SQL queries",
+              "description": "SQL queries for account ownership checks, balance updates and transaction retrieval.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": true,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "03b952aa-714a-4822-ab06-84d0f60ff5d9",
+                  "title": "Dynamic SQL construction (potential SQL injection)",
+                  "status": "Open",
+                  "severity": "Low",
+                  "type": "Tampering",
+                  "description": "list_transactions() builds the SQL text with f-strings (Semgrep: python-sql-dynamic-query-construction, CWE-89). Manual review shows that only the placeholder index (${i}) is interpolated, while the user-controlled value of 'search' is passed as a bound asyncpg parameter, so exploitation is NOT confirmed. The risk is regression: a future change that interpolates a value instead of a placeholder would introduce a real SQL injection. Note also that '%' and '_' in 'search' act as ILIKE wildcards.",
+                  "mitigation": "Use a static parameterized query (e.g. ($2::text IS NULL OR ... ILIKE $2)) or a query builder instead of string concatenation; keep the Semgrep rule in CI as a regression guard; escape LIKE wildcards in user input.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 17,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "informationDisclosure": 0,
+                "denialOfService": 0
+              }
+            },
+            "labels": [
+              "SQL queries"
+            ],
+            "id": "28143782-b02f-4a1a-8835-1e824d6dd479",
+            "source": {
+              "x": 470,
+              "y": 149
+            },
+            "target": {
+              "cell": "2dda7528-5ab9-46c2-92c5-592e815baa5f",
+              "port": "0d59404f-b797-47ff-9f99-ed84c9ec5817"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": "block"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Cache operations",
+              "description": "Redis GET and DELETE operations used for transaction-related cache data.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": true,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "fd7c55e0-ee8e-4ff2-8e7f-12e1d4f0b802",
+                  "title": "Stale or inconsistent cache entries",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "Cache keys for history have the form tx:{user_id}:{limit}:{search}, but after a transfer the code deletes only the key tx:{user_id}, which never matches the stored keys. Cached history may therefore stay stale. In addition, a cache hit currently returns an empty list. In a banking context a user may see an incorrect transaction history, and the cache can hide new transfers.",
+                  "mitigation": "Use one consistent key scheme and invalidate with a pattern or a per-user version counter; set a short TTL; return cached data on a hit and fall back to the database on a miss; treat Redis only as a performance cache, never as a source of truth.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 18,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "informationDisclosure": 0,
+                "denialOfService": 0
+              }
+            },
+            "labels": [
+              "Cache operations"
+            ],
+            "id": "44866afc-62ce-4e90-aa8d-db4161d868aa",
+            "source": {
+              "x": 470,
+              "y": 270
+            },
+            "target": {
+              "cell": "60a34af1-a0f3-4815-944e-07877283e1ff",
+              "port": "cc82056a-75c4-4f43-b577-e4a085b5826d"
             },
             "vertices": []
           },
@@ -907,6 +979,6 @@
     ],
     "diagramTop": 1,
     "reviewer": "",
-    "threatTop": 14
+    "threatTop": 19
   }
 }
