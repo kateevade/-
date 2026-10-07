@@ -44,9 +44,9 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "b2793c1b-6a67-493b-be93-3f003e986f94",
                 "28143782-b02f-4a1a-8835-1e824d6dd479",
-                "44866afc-62ce-4e90-aa8d-db4161d868aa"
+                "44866afc-62ce-4e90-aa8d-db4161d868aa",
+                "b2793c1b-6a67-493b-be93-3f003e986f94"
               ],
               "containedElements": [
                 "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
@@ -365,7 +365,7 @@
                   "title": "API resource exhaustion",
                   "status": "Open",
                   "severity": "Medium",
-                  "type": "Tampering",
+                  "type": "Denial of service",
                   "description": "The API does not show rate limiting or request throttling for transfer and transaction-history endpoints. An attacker may send a large number of requests and consume application, database, or Redis resources, potentially degrading service availability for legitimate users.\n",
                   "mitigation": "Implement rate limiting and request throttling for sensitive endpoints. Configure connection and request timeouts, limit resource consumption, monitor request rates and backend resource usage, and apply appropriate protections at the API gateway or reverse proxy.",
                   "modelType": "STRIDE",
@@ -392,7 +392,7 @@
                   "status": "Open",
                   "severity": "Low",
                   "type": "Information disclosure",
-                  "description": "The API returns 403 for an account that exists but belongs to someone else and 404 'From/To account not found' for a missing account. An authenticated attacker can iterate account IDs and learn which accounts exist\n                 ",
+                  "description": "The API returns 403 for an account that exists but belongs to someone else and 404 'From/To account not found' for a missing account. An authenticated attacker can iterate account IDs and learn which accounts exist.\n                 ",
                   "mitigation": "Return a uniform error for non-owned and non-existing source accounts; for the destination account avoid revealing existence beyond what is required; add rate limiting and monitoring of repeated failed lookups.",
                   "modelType": "STRIDE",
                   "new": false,
@@ -405,8 +405,8 @@
                   "status": "Open",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "GET /transactions возвращает историю владельца, определённого по заголовку X-User-Id. Значение задаёт клиент и не проверяется криптографически, поэтому атакующий может подставить чужой ID и прочитать переводы (суммы, контрагенты, даты).",
-                  "mitigation": "Определять пользователя только по проверенному токену (OAuth2/OIDC или подписанный JWT). Добавить негативные тесты авторизации (пользователь A не читает историю B), логировать доступ к истории.",
+                  "description": "GET /transactions returns the history of the account owner identified by the X-User-Id header. Because this value is supplied by the client and is not cryptographically verified, an attacker can request another user's identifier and read that user's transfers (amounts, counterparties, timestamps). This is a confidentiality breach of financial data.",
+                  "mitigation": "Derive the user identity only from a verified token (OAuth2/OIDC or signed JWT). Add negative authorization tests (user A must not read user B's history) and log access to transaction history for monitoring.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 19,
@@ -417,80 +417,11 @@
                 "spoofing": 1,
                 "tampering": 3,
                 "repudiation": 0,
-                "informationDisclosure": 2,
-                "denialOfService": 0,
+                "informationDisclosure": 4,
+                "denialOfService": 1,
                 "elevationOfPrivilege": 1
               }
             }
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "red",
-                "strokeWidth": 2.5,
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": {
-                  "name": ""
-                },
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 10,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "HTTP API requests",
-              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
-              "outOfScope": false,
-              "isTrustBoundary": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": true,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [
-                {
-                  "id": "c2a4f30b-46c6-4554-8cdf-c2d72adca5e4",
-                  "title": "Sensitive data exposure in HTTP requests",
-                  "status": "Open",
-                  "severity": "High",
-                  "type": "Denial of service",
-                  "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
-                  "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
-                  "modelType": "STRIDE",
-                  "new": false,
-                  "number": 6,
-                  "score": ""
-                }
-              ],
-              "trustBoundaryIds": [
-                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
-              ],
-              "threatFrequency": {
-                "tampering": 0,
-                "informationDisclosure": 2,
-                "denialOfService": 1
-              }
-            },
-            "labels": [
-              "HTTP API requests"
-            ],
-            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
-            "source": {
-              "x": 213,
-              "y": 210
-            },
-            "target": {
-              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
-              "port": "b968de55-b279-44fe-963c-9246441cbda1"
-            },
-            "vertices": []
           },
           {
             "shape": "flow",
@@ -627,6 +558,75 @@
             "target": {
               "cell": "60a34af1-a0f3-4815-944e-07877283e1ff",
               "port": "cc82056a-75c4-4f43-b577-e4a085b5826d"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "HTTP API requests",
+              "description": "Transfer requests and transaction history requests containing X-User-Id and request parameters.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "c2a4f30b-46c6-4554-8cdf-c2d72adca5e4",
+                  "title": "Sensitive data exposure in HTTP requests",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "The client sends authentication information and transfer parameters to the FastAPI backend through HTTP API requests. If the connection is not protected with HTTPS/TLS, an attacker able to observe network traffic may capture the X-User-Id header and sensitive request data. This may expose user identity information and facilitate unauthorized access.",
+                  "mitigation": "Use HTTPS/TLS for all client-to-API communication and redirect or reject unencrypted HTTP connections. Avoid transmitting sensitive authentication information through client-controlled headers without proper authentication. Use secure, signed access tokens and configure appropriate TLS settings.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 6,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "3ac11391-153f-46d6-9f8d-dd776b3d80a9"
+              ],
+              "threatFrequency": {
+                "tampering": 0,
+                "informationDisclosure": 3,
+                "denialOfService": 1
+              }
+            },
+            "labels": [
+              "HTTP API requests"
+            ],
+            "id": "b2793c1b-6a67-493b-be93-3f003e986f94",
+            "source": {
+              "x": 213,
+              "y": 210
+            },
+            "target": {
+              "cell": "f5b05b85-5d40-43ff-80f3-6f8ee226a663",
+              "port": "b968de55-b279-44fe-963c-9246441cbda1"
             },
             "vertices": []
           },
