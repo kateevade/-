@@ -392,7 +392,7 @@
                   "status": "Open",
                   "severity": "Low",
                   "type": "Information disclosure",
-                  "description": "The API returns 403 for an account that exists but belongs to someone else and 404 'From/To account not found' for a missing account. An authenticated attacker can iterate account IDs and learn which accounts exist.\n                 ",
+                  "description": "For the source account, a missing account and an account owned by someone else are indistinguishable (both return 403). For the destination account the API returns 404 'To account not found', which differs from a successful lookup. An authenticated attacker can iterate to_account_id and learn which accounts exist.",
                   "mitigation": "Return a uniform error for non-owned and non-existing source accounts; for the destination account avoid revealing existence beyond what is required; add rate limiting and monitoring of repeated failed lookups.",
                   "modelType": "STRIDE",
                   "new": false,
@@ -417,7 +417,7 @@
                 "spoofing": 1,
                 "tampering": 3,
                 "repudiation": 0,
-                "informationDisclosure": 4,
+                "informationDisclosure": 5,
                 "denialOfService": 1,
                 "elevationOfPrivilege": 1
               }
